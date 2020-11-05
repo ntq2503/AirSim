@@ -125,6 +125,8 @@ void SimHUD::createSimMode()
 
 bool SimHUD::getSettingsText(std::string& settingsText)
 {
+	if (const char* path = std::getenv("AIRSIM_SETTINGS_FILE"))
+		return readSettingsTextFromFile(path, settingsText);
 	return (
 		readSettingsTextFromFile(msr::airlib::Settings::getExecutableFullPath("settings.json"), settingsText)
 		||
