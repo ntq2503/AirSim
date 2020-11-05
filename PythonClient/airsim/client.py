@@ -790,6 +790,18 @@ class VehicleClient:
         """
         self.client.call('simSetWind', wind)
 
+    def simGetReward(self, vehicle_name=''):
+        """
+        Get the reward value
+
+        Args:
+            vehicle_name (str, optional): Name of the vehicle
+
+        Returns:
+            float: Reward value
+        """
+        return self.client.call('simGetReward', vehicle_name)
+
 # -----------------------------------  Multirotor APIs ---------------------------------------------
 class MultirotorClient(VehicleClient, object):
     def __init__(self, ip = "", port = 41451, timeout_value = 3600):

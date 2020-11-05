@@ -374,6 +374,10 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
         getWorldSimApi()->setWind(wind.to());
     });
 
+    pimpl_->server.bind("simGetReward", [&](const std::string& vehicle_name) -> float {
+        return getVehicleSimApi(vehicle_name)->getReward();
+    });
+
     //if we don't suppress then server will bomb out for exceptions raised by any method
     pimpl_->server.suppress_exceptions(true);
 }

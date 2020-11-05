@@ -315,3 +315,8 @@ void PawnSimApi::updateKinematics(float dt)
     kinematics_->setState(next_kinematics);
     kinematics_->update();
 }
+
+float PawnSimApi::getReward() const
+{
+	return GetReward(getVehicleName().c_str());
+}

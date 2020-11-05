@@ -92,6 +92,7 @@ public:
 	void OnCollision(msr::airlib::CollisionInfo collisionInfo);
 	const NedTransform& getNedTransform() const;
 	virtual void pawnTick(float dt);
+	virtual float getReward() const override;
 
 private:
 	Params params_;

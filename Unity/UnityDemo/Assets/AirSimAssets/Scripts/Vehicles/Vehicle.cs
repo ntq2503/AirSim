@@ -46,6 +46,8 @@ namespace AirSimUnity {
         RaycastHit hitInfo;
         bool hitResult;
 
+        protected float reward;
+
         //Ensure to call this method as the first statement, from derived class `Start()` method.
         protected void Start() {
             isDrone = this is Drone ? true : false;
@@ -320,6 +322,10 @@ namespace AirSimUnity {
 
         public virtual CarStructs.CarState GetCarState() {
             throw new NotImplementedException("This is supposed to be implemented in Car sub class");
+        }
+
+        public float GetReward() {
+            return reward;
         }
 
         /****************** Methods for vehicle management **************************/

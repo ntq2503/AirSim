@@ -13,7 +13,8 @@ namespace AirSimUnity {
      * Unity client components should use an instance of this class to interact with AirLib.
      */
 
-    internal class VehicleCompanion : IAirSimInterface {
+    internal class VehicleCompanion : IAirSimInterface
+    {
 
         //All the vehicles that are created in this game.
         private static List<VehicleCompanion> Vehicles = new List<VehicleCompanion>();
@@ -26,17 +27,20 @@ namespace AirSimUnity {
         private string vehicleName;
         private readonly bool isDrone;
 
-        static VehicleCompanion() {
+        static VehicleCompanion()
+        {
             InitDelegators();
         }
 
-        private VehicleCompanion(IVehicleInterface vehicleInterface) {
+        private VehicleCompanion(IVehicleInterface vehicleInterface)
+        {
             VehicleInterface = vehicleInterface;
             isDrone = vehicleInterface is Drone ? true : false;
             basePortId = AirSimSettings.GetSettings().GetPortIDForVehicle(isDrone);
         }
 
-        public static VehicleCompanion GetVehicleCompanion(IVehicleInterface vehicleInterface) {
+        public static VehicleCompanion GetVehicleCompanion(IVehicleInterface vehicleInterface)
+        {
             var companion = new VehicleCompanion(vehicleInterface);
 
             if (AirSimSettings.GetSettings().SimMode == "Car")
@@ -48,11 +52,13 @@ namespace AirSimUnity {
             return companion;
         }
 
-        public bool StartVehicleServer(string hostIP) {
+        public bool StartVehicleServer(string hostIP)
+        {
             return PInvokeWrapper.StartServer(vehicleName, AirSimSettings.GetSettings().SimMode, basePortId);
         }
 
-        public void StopVehicleServer() {
+        public void StopVehicleServer()
+        {
             PInvokeWrapper.StopServer(vehicleName);
         }
 
@@ -66,22 +72,26 @@ namespace AirSimUnity {
             PInvokeWrapper.InvokeCollisionDetection(collisionInfo);
         }
 
-        public KinemticState GetKinematicState() {
+        public KinemticState GetKinematicState()
+        {
             return PInvokeWrapper.GetKinematicState(vehicleName);
         }
 
-        public static DataRecorder.ImageData GetRecordingData() {
+        public static DataRecorder.ImageData GetRecordingData()
+        {
             return Vehicles[0].VehicleInterface.GetRecordingData();
         }
 
-        public static DataCaptureScript GetCameraCaptureForRecording() {
+        public static DataCaptureScript GetCameraCaptureForRecording()
+        {
             AirSimSettings.CamerasSettings recordCamSettings = AirSimSettings.GetSettings().Recording.Cameras[0];
             DataCaptureScript recordCam = Vehicles[0].VehicleInterface.GetCameraCapture(recordCamSettings.CameraName);
             return recordCam;
         }
 
         //Register the delegate functions to AirLib, based on IVehicleInterface
-        private static void InitDelegators() {
+        private static void InitDelegators()
+        {
             PInvokeWrapper.InitVehicleManager(
                 Marshal.GetFunctionPointerForDelegate(new Func<AirSimPose, bool, string, bool>(SetPose)),
                 Marshal.GetFunctionPointerForDelegate(new Func<string, AirSimPose>(GetPose)),
@@ -102,34 +112,40 @@ namespace AirSimUnity {
                 Marshal.GetFunctionPointerForDelegate(new Func<string, bool>(Reset)),
                 Marshal.GetFunctionPointerForDelegate(new Func<string, AirSimVector>(GetVelocity)),
                 Marshal.GetFunctionPointerForDelegate(new Func<AirSimVector, AirSimVector, string, RayCastHitResult>(GetRayCastHit)),
-                Marshal.GetFunctionPointerForDelegate(new Func<string, float, bool>(Pause))
+                Marshal.GetFunctionPointerForDelegate(new Func<string, float, bool>(Pause)),
+                Marshal.GetFunctionPointerForDelegate(new Func<string, float>(GetReward))
             );
         }
 
         /*********************** Delegate functions to be registered with AirLib *****************************/
 
-        private static bool SetPose(AirSimPose pose, bool ignoreCollision, string vehicleName) {
+        private static bool SetPose(AirSimPose pose, bool ignoreCollision, string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             vehicle.VehicleInterface.SetPose(pose, ignoreCollision);
             return true;
         }
 
-        private static AirSimPose GetPose(string vehicleName) {
+        private static AirSimPose GetPose(string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.GetPose();
         }
 
-        private static CollisionInfo GetCollisionInfo(string vehicleName) {
+        private static CollisionInfo GetCollisionInfo(string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.GetCollisionInfo();
         }
 
-        private static AirSimRCData GetRCData(string vehicleName) {
+        private static AirSimRCData GetRCData(string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.GetRCData();
         }
 
-        private static ImageResponse GetSimImages(ImageRequest request, string vehicleName) {
+        private static ImageResponse GetSimImages(ImageRequest request, string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.GetSimulationImages(request);
         }
@@ -159,51 +175,61 @@ namespace AirSimUnity {
             return vehicle.VehicleInterface.GetRayCastHit(start, end);
         }
 
-        private static bool SetRotorSpeed(int rotorIndex, RotorInfo rotorInfo, string vehicleName) {
+        private static bool SetRotorSpeed(int rotorIndex, RotorInfo rotorInfo, string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.SetRotorSpeed(rotorIndex, rotorInfo);
         }
 
-        private static bool SetEnableApi(bool enableApi, string vehicleName) {
+        private static bool SetEnableApi(bool enableApi, string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.SetEnableApi(enableApi);
         }
 
-        private static bool SetCarApiControls(CarControls controls, string vehicleName) {
+        private static bool SetCarApiControls(CarControls controls, string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.SetCarControls(controls);
         }
 
-        private static CarState GetCarState(string vehicleName) {
+        private static CarState GetCarState(string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.GetCarState();
         }
 
-        private static CameraInfo GetCameraInfo(string cameraName, string vehicleName) {
+        private static CameraInfo GetCameraInfo(string cameraName, string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.GetCameraInfo(cameraName);
         }
 
-        private static bool SetCameraPose(string cameraName, AirSimPose pose, string vehicleName) {
+        private static bool SetCameraPose(string cameraName, AirSimPose pose, string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.SetCameraPose(cameraName, pose);
         }
 
-        private static bool SetCameraFoV(string cameraName, float fov_degrees, string vehicleName) {
+        private static bool SetCameraFoV(string cameraName, float fov_degrees, string vehicleName)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.SetCameraFoV(cameraName, fov_degrees);
         }
 
-        private static bool PrintLogMessage(string message, string messageParams, string vehicleName, int severity) {
+        private static bool PrintLogMessage(string message, string messageParams, string vehicleName, int severity)
+        {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.PrintLogMessage(message, messageParams, vehicleName, severity);
         }
 
-        private static bool SetSegmentationObjectId(string objectName, int objectId, bool isNameRegex) {
+        private static bool SetSegmentationObjectId(string objectName, int objectId, bool isNameRegex)
+        {
             return Vehicle.SetSegmentationObjectId(objectName, objectId, isNameRegex);
         }
 
-        private static int GetSegmentationObjectId(string objectName) {
+        private static int GetSegmentationObjectId(string objectName)
+        {
             return Vehicle.GetSegmentationObjectId(objectName);
         }
 
@@ -211,6 +237,12 @@ namespace AirSimUnity {
         {
             var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
             return vehicle.VehicleInterface.Pause(timeScale);
+        }
+
+        private static float GetReward(string vehicleName)
+        {
+            var vehicle = Vehicles.Find(element => element.vehicleName == vehicleName);
+            return vehicle.VehicleInterface.GetReward();
         }
     }
 }
